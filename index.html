@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-K3z4mdukG9fOKRXvWGGqO1/UuShHcPeJf8R0FTT8vis=' 'sha256-crnEEuIa6iyLAPH2cd1pH8SW0m+SaAtx9BGZclmHSJY=' 'sha256-uMUkCsD/MXZKHJWpCIUc1pYrvGeVsCtD5hQ30dOgQVU='; style-src 'sha256-3gq71plylpGbCQfYaPtm67dYAmB0XEaZKzT+6pPRYMg=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c3a2f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Gift Budget Splitter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one narrow column on a pine-to-blush ombre page; white ledger cards sit on top. */
+:root{
+  --bg:#a8d5c0;
+  --g1:#0c3a2f; --g2:#1c7358; --g3:#9fd3bb; --g4:#f4d9d3;   /* page ombre, top to bottom */
+  --card:#ffffff;
+  --ink:#14241d;
+  --muted:#51625a;
+  --line:#d3dcd5;
+  --soft:#e4ece6;
+  --pine:#1c7358;
+  --b1:#1c7358; --b2:#52b98f;                                /* bar fill ombre */
+  --r1:#9c1c2b; --r2:#c8404f;                                /* holly ombre: actions */
+  --accent:#b3262e;
+  --hero:#ffffff;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1d3d37;
+    --g1:#06201a; --g2:#0f4433; --g3:#1d3d37; --g4:#35242a;
+    --card:#17231d; --ink:#e7efe9; --muted:#9db0a5; --line:#2a3b32; --soft:#1f2f27;
+    --pine:#6fcaa2; --b1:#2f8f6c; --b2:#7fe0b7; --accent:#ee7078;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1d3d37;
+  --g1:#06201a; --g2:#0f4433; --g3:#1d3d37; --g4:#35242a;
+  --card:#17231d; --ink:#e7efe9; --muted:#9db0a5; --line:#2a3b32; --soft:#1f2f27;
+  --pine:#6fcaa2; --b1:#2f8f6c; --b2:#7fe0b7; --accent:#ee7078;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%;
+  background:var(--bg) linear-gradient(180deg,var(--g1) 0,var(--g2) 280px,var(--g3) 700px,var(--g4) 100%) no-repeat}
+main{max-width:640px;margin:0 auto;padding:24px 16px 56px;display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,8vw,44px);line-height:1.02;margin:0;letter-spacing:-.01em;text-wrap:balance;color:var(--hero)}
+h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0}
+.lede{margin:8px 0 0;color:rgba(255,255,255,.86);max-width:52ch}
+.clock{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{background:rgba(255,255,255,.16);color:var(--hero);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;margin-top:16px;padding:5px;border-radius:15px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22)}
+.tab{flex:1;background:transparent;border:0;color:#fff;border-radius:11px;min-height:44px;padding:8px 6px;font-weight:700;cursor:pointer}
+.tab[aria-selected="true"]{background:#fff;color:#0c3a2f;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 6px 22px rgba(6,32,26,.12)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2[hidden]{display:none}
+label{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:600;color:var(--muted)}
+label b{color:var(--ink);font-variant-numeric:tabular-nums}
+input,select,button,textarea{font:inherit;color:inherit}
+input,select{font-size:16px;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 11px;width:100%;min-height:44px}
+input[type="range"]{padding:0;min-height:32px;accent-color:var(--pine);background:transparent;border:0}
+input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--pine);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{border-radius:14px;padding:12px;color:#fff;box-shadow:0 6px 18px rgba(6,32,26,.18)}
+.tile small{display:block;font-size:13px;font-weight:600;opacity:.92}
+.tile b{display:block;font-family:var(--display);font-size:clamp(19px,5.4vw,26px);margin-top:2px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.t1{background:linear-gradient(135deg,#0c3a2f,#1c7358)}
+.t2{background:linear-gradient(135deg,#1c7358,#2f8667)}
+.t3{background:linear-gradient(135deg,#9c1c2b,#c8404f)}
+.t3.bad{background:linear-gradient(135deg,#5c0f19,#9c1c2b);outline:2px solid #fff}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.note{font-size:14px;background:linear-gradient(90deg,var(--soft),var(--card));border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.note[hidden]{display:none}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.row{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--card)}
+.row-top{display:flex;gap:8px}
+.row-top .name{font-weight:700}
+.row-mid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row-bot{display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:12px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar span{width:0;display:block;height:100%;background:linear-gradient(90deg,var(--b1),var(--b2));border-radius:99px;transition:width .25s}
+.limit{font-family:var(--display);font-size:20px;min-width:96px;text-align:right;font-variant-numeric:tabular-nums}
+.limit small{display:block;font-family:var(--body);font-size:12px;color:var(--muted);font-weight:600}
+button,.btn{cursor:pointer;border-radius:11px;border:1px solid var(--line);background:var(--card);padding:10px 14px;min-height:44px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+button.primary,.btn.primary{background:linear-gradient(135deg,var(--r1),var(--r2));border-color:transparent;color:#fff}
+button.x{width:44px;padding:0;font-size:22px;line-height:1;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.warn{color:var(--accent);font-weight:700;font-size:15px;margin:0}
+.warn[hidden]{display:none}
+textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:10px;font-size:15px}
+textarea[hidden]{display:none}
+.fine{font-size:13px;color:var(--muted);margin:0}
+.step{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:14px;font-weight:700;color:var(--muted)}
+.amounts,.chips{display:flex;flex-wrap:wrap;gap:8px}
+.amounts button{min-width:64px}
+.chips button{min-height:40px;padding:7px 12px;font-size:15px;font-weight:600}
+.amounts button[aria-pressed="true"],.chips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--g1),var(--g2));border-color:transparent;color:#fff}
+.amounts input{width:120px}
+.result{display:flex;flex-direction:column;gap:10px;border-radius:14px;padding:14px;background:linear-gradient(160deg,var(--soft),var(--card));border:1px solid var(--line)}
+.res-title{margin:0;font-family:var(--display);font-weight:700;font-size:18px}
+.detail{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card)}
+.detail div{min-width:0}
+.detail small{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.detail span{display:block;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+@media (max-width:380px){.tiles{grid-template-columns:1fr 1fr}.row-mid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.bar span{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Gift Budget Splitter</h1>
+    <p class="lede">Enter what you can spend. Add who you are buying for. Get a spending limit for each person that adds up.</p>
+    <div class="tabs" role="tablist" aria-label="Occasion">
+      <button type="button" class="tab" role="tab" id="tab-bf" data-key="bf" aria-selected="true">Black Friday</button>
+      <button type="button" class="tab" role="tab" id="tab-xmas" data-key="xmas" aria-selected="false">Christmas</button>
+      <button type="button" class="tab" role="tab" id="tab-custom" data-key="custom" aria-selected="false">Custom</button>
+    </div>
+    <div class="clock" id="clock" aria-live="polite"></div>
+  </header>
+
+  <section class="card" aria-labelledby="h-budget">
+    <h2 id="h-budget">Your budget</h2>
+    <div class="grid2" id="customFields" hidden>
+      <label for="eventName">Occasion
+        <input id="eventName" type="text" maxlength="40" placeholder="Birthday, wedding, Eid">
+      </label>
+      <label for="eventDate">Date
+        <input id="eventDate" type="date">
+      </label>
+    </div>
+    <div class="grid2">
+      <label for="total">Total to spend
+        <input id="total" type="number" inputmode="decimal" min="0" step="1" value="400">
+      </label>
+      <label for="cur">Currency
+        <select id="cur">
+          <option value="$">$ Dollar</option>
+          <option value="£">£ Pound</option>
+          <option value="€">€ Euro</option>
+          <option value="Rs">Rs Rupee</option>
+          <option value="AED">AED Dirham</option>
+        </select>
+      </label>
+    </div>
+    <label for="reserve"><span>Keep back for wrapping, cards and shipping: <b id="reserveOut">8%</b></span>
+      <input id="reserve" type="range" min="0" max="25" step="1" value="8">
+    </label>
+  </section>
+
+  <section class="tiles" aria-label="Summary">
+    <div class="tile t1"><small>Gift pot</small><b id="tPot">–</b></div>
+    <div class="tile t2"><small>Kept back</small><b id="tRes">–</b></div>
+    <div class="tile t3" id="tLeftBox"><small>Left to split</small><b id="tLeft">–</b></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-people">
+    <div class="head">
+      <h2 id="h-people">Who you are buying for</h2>
+      <button type="button" id="add" class="primary">Add person</button>
+    </div>
+    <div class="note" id="exampleNote">
+      <span>These are example people. Replace them with yours.</span>
+      <button type="button" id="clearEx">Clear</button>
+    </div>
+    <p class="warn" id="warn" hidden></p>
+    <ul id="list"></ul>
+    <p class="fine">Priority decides each person's share: Must have gets 3 parts, Nice to have 2, If room left 1. A known price is taken off the pot first. Each occasion keeps its own list.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-share">
+    <h2 id="h-share">Take your plan with you</h2>
+    <div class="actions">
+      <button type="button" id="copy" class="primary">Copy plan</button>
+      <button type="button" id="reset">Start over</button>
+    </div>
+    <p class="fine" id="copyMsg" role="status"></p>
+    <textarea id="planText" readonly hidden aria-label="Plan text, select and copy"></textarea>
+  </section>
+
+  <section class="card" id="payCard" aria-labelledby="h-pay">
+    <h2 id="h-pay">Support this tool</h2>
+    <p class="fine">Free to use. Pay what you like, from $3. Choose how you pay and where it goes.</p>
+
+    <div class="step">
+      <span class="lbl" id="lbl-amt">1. Amount</span>
+      <div class="amounts" role="group" aria-labelledby="lbl-amt" id="amounts">
+        <button type="button" data-amt="3" aria-pressed="false">$3</button>
+        <button type="button" data-amt="5" aria-pressed="true">$5</button>
+        <button type="button" data-amt="10" aria-pressed="false">$10</button>
+        <input id="customAmt" type="number" inputmode="decimal" min="3" placeholder="Other, $3+" aria-label="Other amount in dollars, minimum 3">
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="lbl" id="lbl-via">2. Pay via</span>
+      <div class="chips" role="group" aria-labelledby="lbl-via" id="viaChips"></div>
+    </div>
+
+    <div class="step">
+      <span class="lbl" id="lbl-to">3. Send to</span>
+      <div class="chips" role="group" aria-labelledby="lbl-to" id="toChips"></div>
+    </div>
+
+    <label for="payerField"><span id="payerLabel">4. Your details</span>
+      <input id="payerField" type="text" maxlength="60" autocomplete="off">
+    </label>
+
+    <div class="result" id="result" aria-live="polite">
+      <p class="res-title" id="resTitle"></p>
+      <div class="detail">
+        <div><small id="destNote"></small><span id="destDetail"></span></div>
+        <button type="button" id="copyDest">Copy</button>
+      </div>
+      <div class="detail">
+        <div><small>Payment note, add it to your payment</small><span id="noteText"></span></div>
+        <button type="button" id="copyNote">Copy</button>
+      </div>
+    </div>
+
+    <p class="fine">For Easypaisa and JazzCash, the equivalent in rupees will be deducted. The amount may vary according to the rate and bank charges.</p>
+    <p class="fine">Not every service can send to every account. If yours cannot send to one, choose the other. What you type here stays on your phone and is only used to write the payment note.</p>
+    <p class="fine" id="payMsg" role="status"></p>
+  </section>
+</main>
+
+<script>
+/* ---- PAYMENT SETTINGS: where money is received ---- */
+var DEST = [
+  {id:"skrill", label:"Skrill", note:"Skrill email", detail:atob("SGF6ZWwuTnlsZUBnbWFpbC5jb20=")},
+  {id:"easypaisa", label:"Easypaisa", note:"Easypaisa account (IBAN)", detail:atob("UEsxN1RNRkIwMDAwMDAwMDYxMjg0MDQ5")}
+];
+/* ---- how a payer can send: field = what the payer fills in ---- */
+var VIA = [
+  {id:"bank",      label:"Bank transfer", phrase:"bank transfer", field:"Name on your bank account", ph:"Account holder name"},
+  {id:"binance",   label:"Binance",       field:"Your Binance Pay ID",   ph:"Binance Pay ID"},
+  {id:"venmo",     label:"Venmo",         field:"Your Venmo username",   ph:"@username"},
+  {id:"payoneer",  label:"Payoneer",      field:"Your Payoneer email",   ph:"name@email.com"},
+  {id:"wise",      label:"Wise",          field:"Your Wise email or name", ph:"name@email.com"},
+  {id:"skrill",    label:"Skrill",        field:"Your Skrill email",     ph:"name@email.com"},
+  {id:"easypaisa", label:"Easypaisa",     field:"Your Easypaisa number", ph:"03XX XXXXXXX"},
+  {id:"jazzcash",  label:"JazzCash",      field:"Your JazzCash number",  ph:"03XX XXXXXXX"},
+  {id:"paypal",    label:"PayPal",        field:"Your PayPal email",     ph:"name@email.com"},
+  {id:"kofi",      label:"Ko-fi",         field:"Your Ko-fi name",       ph:"Name on Ko-fi"}
+];
+</script>
+<script>
+(function(){
+  var KEY = "gift-budget-splitter-v2";
+  var WEIGHT = {must:3, nice:2, room:1};
+  var LABEL  = {must:"Must have", nice:"Nice to have", room:"If room left"};
+  var KEYS = ["bf","xmas","custom"];
+  var nextId = 1;
+  var $ = function(id){ return document.getElementById(id); };
+  var list = $("list");
+
+  function person(name, tier, fixed){ return {id:nextId++, name:name, tier:tier, fixed:fixed || ""}; }
+  function makePlan(key){
+    if (key === "bf") return {total:400, cur:"$", reserve:5, example:true, people:[
+      person("Dad", "must"), person("Sister", "nice"), person("Cousin", "nice"), person("Treat for me", "room", "25")]};
+    if (key === "xmas") return {total:400, cur:"$", reserve:10, example:true, people:[
+      person("Mum", "must"), person("Brother", "nice"), person("Best friend", "nice"), person("Secret Santa at work", "room", "15")]};
+    return {total:150, cur:"$", reserve:0, example:true, eventName:"", date:"", people:[
+      person("Guest of honour", "must"), person("Plus one", "nice")]};
+  }
+
+  var store = null;
+  try { var raw = localStorage.getItem(KEY); if (raw) store = JSON.parse(raw); } catch(e) { store = null; }
+  if (!store || !store.plans) store = {active:"bf", plans:{}};
+  KEYS.forEach(function(k){
+    var pl = store.plans[k];
+    if (pl && pl.people) pl.people.forEach(function(p){ if (p.id >= nextId) nextId = p.id + 1; });
+  });
+  KEYS.forEach(function(k){ if (!store.plans[k] || !store.plans[k].people) store.plans[k] = makePlan(k); });
+  if (KEYS.indexOf(store.active) < 0) store.active = "bf";
+  var state = store.plans[store.active];
+
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e) {} }
+  function num(v){ var n = parseFloat(v); return isFinite(n) && n > 0 ? n : 0; }
+  function money(n){
+    var s = state.cur;
+    var t = Math.round(n).toLocaleString();
+    return (s.length > 1 ? s + " " : s) + t;
+  }
+
+  /* ---- countdown ---- */
+  function daysTo(d){
+    var t = new Date(); t.setHours(0,0,0,0);
+    return Math.round((d - t) / 86400000);
+  }
+  function blackFriday(y){            /* day after the fourth Thursday of November */
+    var d = new Date(y, 10, 1);
+    var firstThu = 1 + ((4 - d.getDay() + 7) % 7);
+    return new Date(y, 10, firstThu + 21 + 1);
+  }
+  function phrase(name, n){
+    if (n > 0) return name + " in " + n + (n === 1 ? " day" : " days");
+    if (n === 0) return name + " is today";
+    return name + " was " + (-n) + (n === -1 ? " day" : " days") + " ago";
+  }
+  function renderClock(){
+    var y = new Date().getFullYear(), text = "";
+    if (store.active === "bf") text = phrase("Black Friday", daysTo(blackFriday(y)));
+    else if (store.active === "xmas") {
+      var xm = new Date(y, 11, 25);
+      if (daysTo(xm) < 0) xm = new Date(y + 1, 11, 25);
+      text = phrase("Christmas", daysTo(xm));
+    } else if (state.date) {
+      text = phrase(state.eventName || "Your occasion", daysTo(new Date(state.date + "T00:00:00")));
+    } else text = "Pick a date to see the countdown";
+    $("clock").innerHTML = "";
+    var c = document.createElement("span"); c.className = "chip"; c.textContent = text;
+    $("clock").appendChild(c);
+  }
+
+  /* ---- maths ---- */
+  function compute(){
+    var total = num(state.total);
+    var reserve = total * state.reserve / 100;
+    var pot = total - reserve;
+    var fixedSum = 0, wSum = 0;
+    state.people.forEach(function(p){
+      var f = num(p.fixed);
+      if (f > 0) fixedSum += f; else wSum += WEIGHT[p.tier];
+    });
+    var flex = pot - fixedSum;
+    var limits = {};
+    state.people.forEach(function(p){
+      var f = num(p.fixed);
+      if (f > 0) limits[p.id] = {amt:f, fixed:true};
+      else limits[p.id] = {amt: (flex > 0 && wSum > 0) ? flex * WEIGHT[p.tier] / wSum : 0, fixed:false};
+    });
+    return {total:total, reserve:reserve, pot:pot, fixedSum:fixedSum, flex:flex, wSum:wSum, limits:limits};
+  }
+
+  function update(){
+    var c = compute();
+    $("tPot").textContent = money(c.pot);
+    $("tRes").textContent = money(c.reserve);
+    $("tLeft").textContent = money(c.flex);
+    $("tLeftBox").classList.toggle("bad", c.flex < 0);
+    $("reserveOut").textContent = state.reserve + "%";
+
+    var w = $("warn");
+    if (c.flex < 0) {
+      w.hidden = false;
+      w.textContent = "Known prices are " + money(-c.flex) + " over your gift pot. Raise the total or lower a price.";
+    } else if (state.people.length && c.wSum === 0 && c.flex > 0) {
+      w.hidden = false;
+      w.textContent = money(c.flex) + " is not assigned. Remove a known price to let it be shared.";
+    } else { w.hidden = true; }
+
+    state.people.forEach(function(p){
+      var row = list.querySelector('[data-id="' + p.id + '"]');
+      if (!row) return;
+      var l = c.limits[p.id];
+      row.querySelector(".limit-amt").textContent = money(l.amt);
+      row.querySelector(".limit-tag").textContent = l.fixed ? "known price" : "up to";
+      var pct = c.pot > 0 ? Math.min(100, l.amt / c.pot * 100) : 0;
+      row.querySelector(".bar span").style.width = pct + "%";
+    });
+    $("exampleNote").hidden = !state.example;
+    save();
+  }
+
+  function renderRows(){
+    list.innerHTML = "";
+    state.people.forEach(function(p){
+      var li = document.createElement("li");
+      li.className = "row";
+      li.setAttribute("data-id", p.id);
+      li.innerHTML =
+        '<div class="row-top">' +
+          '<input class="name" id="name-' + p.id + '" aria-label="Name" placeholder="Name" maxlength="40">' +
+          '<button type="button" class="x" aria-label="Remove">×</button>' +
+        '</div>' +
+        '<div class="row-mid">' +
+          '<label for="tier-' + p.id + '">Priority<select id="tier-' + p.id + '">' +
+            '<option value="must">Must have</option>' +
+            '<option value="nice">Nice to have</option>' +
+            '<option value="room">If room left</option>' +
+          '</select></label>' +
+          '<label for="fixed-' + p.id + '">Known price<input id="fixed-' + p.id + '" type="number" inputmode="decimal" min="0" placeholder="optional"></label>' +
+        '</div>' +
+        '<div class="row-bot"><div class="bar"><span></span></div>' +
+          '<div class="limit"><small class="limit-tag">up to</small><span class="limit-amt">–</span></div></div>';
+      list.appendChild(li);
+      li.querySelector(".name").value = p.name;
+      li.querySelector("select").value = p.tier;
+      li.querySelector('input[type="number"]').value = p.fixed;
+    });
+    update();
+  }
+
+  function find(id){ return state.people.filter(function(p){ return p.id === id; })[0]; }
+  function rowId(el){ var r = el.closest(".row"); return r ? parseInt(r.getAttribute("data-id"), 10) : null; }
+
+  list.addEventListener("input", function(e){
+    var p = find(rowId(e.target)); if (!p) return;
+    if (e.target.classList.contains("name")) p.name = e.target.value;
+    else if (e.target.type === "number") p.fixed = e.target.value;
+    state.example = false;
+    update();
+  });
+  list.addEventListener("change", function(e){
+    var p = find(rowId(e.target)); if (!p) return;
+    if (e.target.tagName === "SELECT") { p.tier = e.target.value; state.example = false; update(); }
+  });
+  list.addEventListener("click", function(e){
+    if (!e.target.classList.contains("x")) return;
+    var id = rowId(e.target);
+    state.people = state.people.filter(function(p){ return p.id !== id; });
+    state.example = false;
+    renderRows();
+  });
+
+  $("total").addEventListener("input", function(e){ state.total = e.target.value; state.example = false; update(); });
+  $("cur").addEventListener("change", function(e){ state.cur = e.target.value; update(); });
+  $("reserve").addEventListener("input", function(e){ state.reserve = parseInt(e.target.value, 10) || 0; update(); });
+  $("eventName").addEventListener("input", function(e){ state.eventName = e.target.value; renderClock(); save(); });
+  $("eventDate").addEventListener("input", function(e){ state.date = e.target.value; renderClock(); save(); });
+
+  $("add").addEventListener("click", function(){
+    state.people.push({id:nextId++, name:"", tier:"nice", fixed:""});
+    state.example = false;
+    renderRows();
+    var last = list.lastElementChild;
+    if (last) last.querySelector(".name").focus();
+  });
+  $("clearEx").addEventListener("click", function(){
+    state.people = []; state.example = false; renderRows();
+  });
+  $("reset").addEventListener("click", function(){
+    store.plans[store.active] = makePlan(store.active);
+    state = store.plans[store.active];
+    syncInputs(); renderRows(); renderClock();
+    $("copyMsg").textContent = ""; $("planText").hidden = true;
+  });
+
+  /* ---- occasion tabs ---- */
+  function setTab(key){
+    store.active = key;
+    state = store.plans[key];
+    KEYS.forEach(function(k){ $("tab-" + k).setAttribute("aria-selected", k === key ? "true" : "false"); });
+    $("copyMsg").textContent = ""; $("planText").hidden = true;
+    syncInputs(); renderRows(); renderClock();
+  }
+  document.querySelector(".tabs").addEventListener("click", function(e){
+    var b = e.target.closest(".tab"); if (b) setTab(b.getAttribute("data-key"));
+  });
+
+  function planText(){
+    var c = compute();
+    var title = store.active === "bf" ? "Black Friday" : store.active === "xmas" ? "Christmas" : (state.eventName || "Gift");
+    var lines = [title + " plan: " + money(c.total) + " in total",
+                 "Kept back (" + state.reserve + "%): " + money(c.reserve), ""];
+    state.people.forEach(function(p){
+      var l = c.limits[p.id];
+      lines.push((p.name || "Unnamed") + ": " + (l.fixed ? "" : "up to ") + money(l.amt) + " (" + LABEL[p.tier] + ")");
+    });
+    return lines.join("\n");
+  }
+  function copyText(t, okMsg, target){
+    var done = function(ok){ target.textContent = ok ? okMsg : "Your browser blocked copying. Select the text and copy it."; return ok; };
+    try { return navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){ done(false); }); }
+    catch(e) { done(false); }
+  }
+  $("copy").addEventListener("click", function(){
+    var t = planText(), ta = $("planText");
+    ta.value = t;
+    var r = copyText(t, "Plan copied.", $("copyMsg"));
+    if (r && r.then) r.then(function(){ ta.hidden = $("copyMsg").textContent === "Plan copied."; });
+    else ta.hidden = false;
+  });
+
+  function syncInputs(){
+    $("total").value = state.total;
+    $("cur").value = state.cur;
+    $("reserve").value = state.reserve;
+    $("customFields").hidden = store.active !== "custom";
+    $("eventName").value = state.eventName || "";
+    $("eventDate").value = state.date || "";
+  }
+
+  /* ---- support section: amount, pay via, send to, payer details ---- */
+  var pay = {amount:5, via:"wise", to:"skrill"};
+  var REF = "GBS-" + (function(){
+    var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += a.charAt(Math.floor(Math.random() * a.length));
+    return s;
+  })();
+  function byId(arr, id){ return arr.filter(function(x){ return x.id === id; })[0]; }
+
+  function renderChips(box, items, current, onPick){
+    box.innerHTML = "";
+    items.forEach(function(it){
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = it.label;
+      b.setAttribute("aria-pressed", it.id === current ? "true" : "false");
+      b.addEventListener("click", function(){ onPick(it.id); });
+      box.appendChild(b);
+    });
+  }
+  function renderPay(){
+    var via = byId(VIA, pay.via), to = byId(DEST, pay.to);
+    renderChips($("viaChips"), VIA, pay.via, function(id){ pay.via = id; $("payerField").value = ""; renderPay(); });
+    renderChips($("toChips"), DEST, pay.to, function(id){ pay.to = id; renderPay(); });
+
+    $("payerLabel").textContent = "4. " + via.field;
+    $("payerField").placeholder = via.ph;
+    $("resTitle").textContent = "Send $" + pay.amount + " via " + (via.phrase || via.label) + " to " + to.label;
+    $("destNote").textContent = to.note;
+    $("destDetail").textContent = to.detail;
+
+    var who = $("payerField").value.trim();
+    $("noteText").textContent = "Gift Budget Splitter support, $" + pay.amount + " via " + (via.phrase || via.label) +
+      (who ? ", from " + who : "") + ". Ref " + REF;
+  }
+  function setAmount(n, fromCustom){
+    pay.amount = n;
+    Array.prototype.forEach.call($("amounts").querySelectorAll("button"), function(b){
+      b.setAttribute("aria-pressed", (!fromCustom && parseInt(b.getAttribute("data-amt"), 10) === n) ? "true" : "false");
+    });
+    renderPay();
+  }
+  $("amounts").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-amt]"); if (!b) return;
+    $("customAmt").value = "";
+    $("payMsg").textContent = "";
+    setAmount(parseInt(b.getAttribute("data-amt"), 10), false);
+  });
+  $("customAmt").addEventListener("input", function(e){
+    var n = Math.floor(parseFloat(e.target.value));
+    if (!isFinite(n)) { $("payMsg").textContent = ""; return; }
+    if (n < 3) { $("payMsg").textContent = "The minimum is $3."; setAmount(3, true); return; }
+    $("payMsg").textContent = "";
+    setAmount(n, true);
+  });
+  $("payerField").addEventListener("input", renderPay);
+  $("copyDest").addEventListener("click", function(){
+    copyText(byId(DEST, pay.to).detail, byId(DEST, pay.to).label + " details copied.", $("payMsg"));
+  });
+  $("copyNote").addEventListener("click", function(){
+    copyText($("noteText").textContent, "Payment note copied.", $("payMsg"));
+  });
+
+  /* ---- start ---- */
+  KEYS.forEach(function(k){ $("tab-" + k).setAttribute("aria-selected", k === store.active ? "true" : "false"); });
+  syncInputs();
+  renderClock();
+  renderRows();
+  renderPay();
+})();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
