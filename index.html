@@ -2,30 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-K3z4mdukG9fOKRXvWGGqO1/UuShHcPeJf8R0FTT8vis=' 'sha256-crnEEuIa6iyLAPH2cd1pH8SW0m+SaAtx9BGZclmHSJY=' 'sha256-uMUkCsD/MXZKHJWpCIUc1pYrvGeVsCtD5hQ30dOgQVU='; style-src 'sha256-3gq71plylpGbCQfYaPtm67dYAmB0XEaZKzT+6pPRYMg=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mB1D0JuwtWx3xNiYnSo/VDb8Tq1yeEXyPoxA1oF/rcU=' 'sha256-9zbkgA2Uhfwp4QOR8URQJUF8N5Vq+5DShpEhQzKylMY=' 'sha256-uMUkCsD/MXZKHJWpCIUc1pYrvGeVsCtD5hQ30dOgQVU='; style-src 'sha256-jS/YkVhB74rlbq8x/aBDrnmSJSCbaBOpum735N3zkcs=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0c3a2f">
+<meta name="theme-color" content="#066b75">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Gift Budget Splitter</title>
+<title>Gifty</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 /* Layout idea: one narrow column on a pine-to-blush ombre page; white ledger cards sit on top. */
 :root{
-  --bg:#a8d5c0;
-  --g1:#0c3a2f; --g2:#1c7358; --g3:#9fd3bb; --g4:#f4d9d3;   /* page ombre, top to bottom */
+  --bg:#a6e8de;
+  --g1:#066b75; --g2:#0e9aa0; --g3:#a6e8de; --g4:#fde0d0;   /* page ombre, turquoise to peach */
+  --sel1:#066b75; --sel2:#0b838b;                            /* selected chips */
+  --on-peach:#5a2a1a;                                        /* text on peach buttons */
   --card:#ffffff;
   --ink:#14241d;
   --muted:#51625a;
-  --line:#d3dcd5;
-  --soft:#e4ece6;
-  --pine:#1c7358;
-  --b1:#1c7358; --b2:#52b98f;                                /* bar fill ombre */
-  --r1:#9c1c2b; --r2:#c8404f;                                /* holly ombre: actions */
+  --line:#cfe3df;
+  --soft:#e1f3f0;
+  --pine:#0e8a92;
+  --b1:#0e9aa0; --b2:#4fd8c9;                                /* bar fill ombre */
+  --r1:#ffcaa6; --r2:#ffae96;                                /* holly ombre: actions */
   --accent:#b3262e;
   --hero:#ffffff;
   --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
@@ -33,18 +35,18 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#1d3d37;
-    --g1:#06201a; --g2:#0f4433; --g3:#1d3d37; --g4:#35242a;
-    --card:#17231d; --ink:#e7efe9; --muted:#9db0a5; --line:#2a3b32; --soft:#1f2f27;
-    --pine:#6fcaa2; --b1:#2f8f6c; --b2:#7fe0b7; --accent:#ee7078;
+    --bg:#1b4a4d;
+    --g1:#04262b; --g2:#0a5a62; --g3:#1b4a4d; --g4:#3a2a2c;
+    --card:#142b2d; --ink:#e7efe9; --muted:#9db0a5; --line:#2a4a4c; --soft:#1d3a3c;
+    --pine:#5fe0d2; --b1:#1aa6a6; --b2:#6fe8da; --accent:#ee7078; --sel1:#0a5a62; --sel2:#0f7480;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#1d3d37;
-  --g1:#06201a; --g2:#0f4433; --g3:#1d3d37; --g4:#35242a;
-  --card:#17231d; --ink:#e7efe9; --muted:#9db0a5; --line:#2a3b32; --soft:#1f2f27;
-  --pine:#6fcaa2; --b1:#2f8f6c; --b2:#7fe0b7; --accent:#ee7078;
+  --bg:#1b4a4d;
+  --g1:#04262b; --g2:#0a5a62; --g3:#1b4a4d; --g4:#3a2a2c;
+  --card:#142b2d; --ink:#e7efe9; --muted:#9db0a5; --line:#2a4a4c; --soft:#1d3a3c;
+  --pine:#5fe0d2; --b1:#1aa6a6; --b2:#6fe8da; --accent:#ee7078; --sel1:#0a5a62; --sel2:#0f7480;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -57,12 +59,14 @@ h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0}
 .lede{margin:8px 0 0;color:rgba(255,255,255,.86);max-width:52ch}
 .clock{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .chip{background:rgba(255,255,255,.16);color:var(--hero);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
-.tabs{display:flex;gap:6px;margin-top:16px;padding:5px;border-radius:15px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22)}
-.tab{flex:1;background:transparent;border:0;color:#fff;border-radius:11px;min-height:44px;padding:8px 6px;font-weight:700;cursor:pointer}
-.tab[aria-selected="true"]{background:#fff;color:#0c3a2f;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:16px;padding:5px;border-radius:15px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22)}
+.tab{background:transparent;border:0;color:#fff;border-radius:11px;min-height:44px;padding:8px 4px;font-weight:700;font-size:14px;cursor:pointer}
+.tab[aria-selected="true"]{background:#fff;color:#066b75;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 6px 22px rgba(6,32,26,.12)}
+.card[hidden],.tiles[hidden]{display:none}
+.stack{display:flex;flex-direction:column;gap:12px}
+.stack[hidden]{display:none}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid2[hidden]{display:none}
 label{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:600;color:var(--muted)}
 label b{color:var(--ink);font-variant-numeric:tabular-nums}
 input,select,button,textarea{font:inherit;color:inherit}
@@ -73,10 +77,10 @@ input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-vis
 .tile{border-radius:14px;padding:12px;color:#fff;box-shadow:0 6px 18px rgba(6,32,26,.18)}
 .tile small{display:block;font-size:13px;font-weight:600;opacity:.92}
 .tile b{display:block;font-family:var(--display);font-size:clamp(19px,5.4vw,26px);margin-top:2px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.t1{background:linear-gradient(135deg,#0c3a2f,#1c7358)}
-.t2{background:linear-gradient(135deg,#1c7358,#2f8667)}
-.t3{background:linear-gradient(135deg,#9c1c2b,#c8404f)}
-.t3.bad{background:linear-gradient(135deg,#5c0f19,#9c1c2b);outline:2px solid #fff}
+.t1{background:linear-gradient(135deg,#066b75,#0b838b)}
+.t2{background:linear-gradient(135deg,#0b838b,#119094)}
+.t3{background:linear-gradient(135deg,#ffd3b8,#ffb8a3);color:#5a2a1a}
+.t3.bad{background:linear-gradient(135deg,#ffb3ad,#ff8f8f);outline:2px solid #5a2a1a}
 .head{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .note{font-size:14px;background:linear-gradient(90deg,var(--soft),var(--card));border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .note[hidden]{display:none}
@@ -91,20 +95,25 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
 .limit{font-family:var(--display);font-size:20px;min-width:96px;text-align:right;font-variant-numeric:tabular-nums}
 .limit small{display:block;font-family:var(--body);font-size:12px;color:var(--muted);font-weight:600}
 button,.btn{cursor:pointer;border-radius:11px;border:1px solid var(--line);background:var(--card);padding:10px 14px;min-height:44px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;text-align:center}
-button.primary,.btn.primary{background:linear-gradient(135deg,var(--r1),var(--r2));border-color:transparent;color:#fff}
+button.primary,.btn.primary{background:linear-gradient(135deg,var(--r1),var(--r2));border-color:transparent;color:var(--on-peach)}
 button.x{width:44px;padding:0;font-size:22px;line-height:1;color:var(--muted)}
 .actions{display:flex;flex-wrap:wrap;gap:10px}
 .warn{color:var(--accent);font-weight:700;font-size:15px;margin:0}
 .warn[hidden]{display:none}
-textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:10px;font-size:15px}
+textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:10px;font-size:16px}
 textarea[hidden]{display:none}
+#santaNames{min-height:120px}
 .fine{font-size:13px;color:var(--muted);margin:0}
+.santa-btn{width:100%;justify-content:space-between;gap:12px;background:linear-gradient(90deg,var(--soft),var(--card));text-align:left}
+.santa-btn span:last-child{font-weight:600;color:var(--muted);text-align:right}
+.santa-btn[aria-expanded="true"]{background:linear-gradient(135deg,var(--sel1),var(--sel2));border-color:transparent;color:#fff}
+.santa-btn[aria-expanded="true"] span:last-child{color:#fff}
 .step{display:flex;flex-direction:column;gap:8px}
 .lbl{font-size:14px;font-weight:700;color:var(--muted)}
 .amounts,.chips{display:flex;flex-wrap:wrap;gap:8px}
 .amounts button{min-width:64px}
 .chips button{min-height:40px;padding:7px 12px;font-size:15px;font-weight:600}
-.amounts button[aria-pressed="true"],.chips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--g1),var(--g2));border-color:transparent;color:#fff}
+.amounts button[aria-pressed="true"],.chips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--sel1),var(--sel2));border-color:transparent;color:#fff}
 .amounts input{width:120px}
 .result{display:flex;flex-direction:column;gap:10px;border-radius:14px;padding:14px;background:linear-gradient(160deg,var(--soft),var(--card));border:1px solid var(--line)}
 .res-title{margin:0;font-family:var(--display);font-weight:700;font-size:18px}
@@ -112,6 +121,16 @@ textarea[hidden]{display:none}
 .detail div{min-width:0}
 .detail small{display:block;font-size:12px;font-weight:600;color:var(--muted)}
 .detail span{display:block;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+.budget-top{display:grid;grid-template-columns:1fr 104px;gap:14px;align-items:center}
+.pot{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.potsvg{width:88px;height:auto}
+.potbody{fill:var(--soft)}
+.potline{fill:none;stroke:var(--pine);stroke-width:3}
+.potlid{fill:var(--pine)}
+.coin{fill:#ffd9b8;stroke:#e59a78;stroke-width:1.5}
+.pot small{font-size:12px;font-weight:600;color:var(--muted)}
+.pot b{font-family:var(--display);font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+@media (max-width:440px){.tabs{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:380px){.tiles{grid-template-columns:1fr 1fr}.row-mid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.bar span{transition:none}}
 </style>
@@ -119,27 +138,39 @@ textarea[hidden]{display:none}
 <body>
 <main>
   <header>
-    <h1>Gift Budget Splitter</h1>
+    <h1 id="brandName">Gifty</h1>
     <p class="lede">Enter what you can spend. Add who you are buying for. Get a spending limit for each person that adds up.</p>
     <div class="tabs" role="tablist" aria-label="Occasion">
       <button type="button" class="tab" role="tab" id="tab-bf" data-key="bf" aria-selected="true">Black Friday</button>
       <button type="button" class="tab" role="tab" id="tab-xmas" data-key="xmas" aria-selected="false">Christmas</button>
+      <button type="button" class="tab" role="tab" id="tab-santa" data-key="santa" aria-selected="false">Secret Santa</button>
       <button type="button" class="tab" role="tab" id="tab-custom" data-key="custom" aria-selected="false">Custom</button>
     </div>
     <div class="clock" id="clock" aria-live="polite"></div>
   </header>
 
-  <section class="card" aria-labelledby="h-budget">
+  <section class="card" id="secBudget" aria-labelledby="h-budget">
     <h2 id="h-budget">Your budget</h2>
-    <div class="grid2" id="customFields" hidden>
-      <label for="eventName">Occasion
-        <input id="eventName" type="text" maxlength="40" placeholder="Birthday, wedding, Eid">
-      </label>
-      <label for="eventDate">Date
-        <input id="eventDate" type="date">
+    <div class="stack" id="customFields" hidden>
+      <div class="grid2">
+        <label for="eventName">Occasion
+          <input id="eventName" type="text" maxlength="40" placeholder="Birthday, wedding, Eid">
+        </label>
+        <label for="eventDate">Date
+          <input id="eventDate" type="date">
+        </label>
+      </div>
+      <label for="preset">Start from a template
+        <select id="preset">
+          <option value="">Pick one to fill the list</option>
+          <option value="wedding">Wedding</option>
+          <option value="party">Party</option>
+          <option value="eid">Eid gifts</option>
+        </select>
       </label>
     </div>
-    <div class="grid2">
+    <div class="budget-top">
+    <div class="stack">
       <label for="total">Total to spend
         <input id="total" type="number" inputmode="decimal" min="0" step="1" value="400">
       </label>
@@ -153,32 +184,69 @@ textarea[hidden]{display:none}
         </select>
       </label>
     </div>
+    <figure class="pot" aria-label="Money pot">
+      <svg class="potsvg" viewBox="0 0 80 92" role="img" aria-label="Money pot, level shows how much of the gift pot is still unassigned" focusable="false">
+        <defs>
+          <linearGradient id="potGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fe8da"/><stop offset="1" stop-color="#0e9aa0"/></linearGradient>
+          <clipPath id="potClip"><rect x="12" y="20" width="56" height="66" rx="16"/></clipPath>
+        </defs>
+        <rect class="potbody" x="12" y="20" width="56" height="66" rx="16"/>
+        <g clip-path="url(#potClip)">
+          <rect id="potFill" x="12" y="86" width="56" height="0" fill="url(#potGrad)"/>
+          <circle class="coin" cx="28" cy="78" r="6"/>
+          <circle class="coin" cx="42" cy="80" r="6"/>
+          <circle class="coin" cx="55" cy="77" r="6"/>
+        </g>
+        <rect class="potline" x="12" y="20" width="56" height="66" rx="16"/>
+        <rect class="potlid" x="20" y="8" width="40" height="12" rx="5"/>
+      </svg>
+      <small>Gift pot</small>
+      <b id="potCap">–</b>
+    </figure>
+    </div>
     <label for="reserve"><span>Keep back for wrapping, cards and shipping: <b id="reserveOut">8%</b></span>
       <input id="reserve" type="range" min="0" max="25" step="1" value="8">
     </label>
   </section>
 
-  <section class="tiles" aria-label="Summary">
+  <section class="tiles" id="secTiles" aria-label="Summary">
     <div class="tile t1"><small>Gift pot</small><b id="tPot">–</b></div>
     <div class="tile t2"><small>Kept back</small><b id="tRes">–</b></div>
     <div class="tile t3" id="tLeftBox"><small>Left to split</small><b id="tLeft">–</b></div>
   </section>
 
-  <section class="card" aria-labelledby="h-people">
+  <section class="card" id="secPeople" aria-labelledby="h-people">
     <div class="head">
       <h2 id="h-people">Who you are buying for</h2>
       <button type="button" id="add" class="primary">Add person</button>
     </div>
     <div class="note" id="exampleNote">
-      <span>These are example people. Replace them with yours.</span>
+      <span>These are examples. Replace them with yours.</span>
       <button type="button" id="clearEx">Clear</button>
     </div>
     <p class="warn" id="warn" hidden></p>
     <ul id="list"></ul>
-    <p class="fine">Priority decides each person's share: Must have gets 3 parts, Nice to have 2, If room left 1. A known price is taken off the pot first. Each occasion keeps its own list.</p>
+    <p class="fine">Priority decides each share: Must have gets 3 parts, Nice to have 2, If room left 1. A known price is taken off the pot first. Each occasion keeps its own list.</p>
   </section>
 
-  <section class="card" aria-labelledby="h-share">
+  <section class="card" id="secSanta" aria-labelledby="h-santa" hidden>
+    <h2 id="h-santa">Secret Santa draw</h2>
+    <p class="fine">Add everyone taking part, one name per line, at least 3. Draw, then pass the phone: each person taps their own name to see who they got, then taps again to hide it.</p>
+    <label for="santaLimit">Spending limit per gift
+      <input id="santaLimit" type="text" maxlength="14" placeholder="For example $25">
+    </label>
+    <label for="santaNames">Names
+      <textarea id="santaNames" placeholder="Ayesha&#10;Bilal&#10;Sara&#10;Omar"></textarea>
+    </label>
+    <div class="actions">
+      <button type="button" id="santaDraw" class="primary">Draw names</button>
+      <button type="button" id="santaClear">Clear</button>
+    </div>
+    <p class="warn" id="santaMsg" role="status" hidden></p>
+    <ul id="santaList"></ul>
+  </section>
+
+  <section class="card" id="secShare" aria-labelledby="h-share">
     <h2 id="h-share">Take your plan with you</h2>
     <div class="actions">
       <button type="button" id="copy" class="primary">Copy plan</button>
@@ -190,15 +258,15 @@ textarea[hidden]{display:none}
 
   <section class="card" id="payCard" aria-labelledby="h-pay">
     <h2 id="h-pay">Support this tool</h2>
-    <p class="fine">Free to use. Pay what you like, from $3. Choose how you pay and where it goes.</p>
+    <p class="fine">Priced from $1. Choose how you pay and where it goes.</p>
 
     <div class="step">
       <span class="lbl" id="lbl-amt">1. Amount</span>
       <div class="amounts" role="group" aria-labelledby="lbl-amt" id="amounts">
-        <button type="button" data-amt="3" aria-pressed="false">$3</button>
-        <button type="button" data-amt="5" aria-pressed="true">$5</button>
-        <button type="button" data-amt="10" aria-pressed="false">$10</button>
-        <input id="customAmt" type="number" inputmode="decimal" min="3" placeholder="Other, $3+" aria-label="Other amount in dollars, minimum 3">
+        <button type="button" data-amt="1" aria-pressed="false">$1</button>
+        <button type="button" data-amt="3" aria-pressed="true">$3</button>
+        <button type="button" data-amt="5" aria-pressed="false">$5</button>
+        <input id="customAmt" type="number" inputmode="decimal" min="1" placeholder="Other, $1+" aria-label="Other amount in dollars, minimum 1">
       </div>
     </div>
 
@@ -235,6 +303,9 @@ textarea[hidden]{display:none}
 </main>
 
 <script>
+/* ---- BRAND: change the name here to white-label a copy ---- */
+var BRAND = {name:"Gifty"};
+
 /* ---- PAYMENT SETTINGS: where money is received ---- */
 var DEST = [
   {id:"skrill", label:"Skrill", note:"Skrill email", detail:atob("SGF6ZWwuTnlsZUBnbWFpbC5jb20=")},
@@ -260,11 +331,20 @@ var VIA = [
   var WEIGHT = {must:3, nice:2, room:1};
   var LABEL  = {must:"Must have", nice:"Nice to have", room:"If room left"};
   var KEYS = ["bf","xmas","custom"];
+  var TABS = ["bf","xmas","santa","custom"];
   var nextId = 1;
   var $ = function(id){ return document.getElementById(id); };
   var list = $("list");
 
+  document.title = BRAND.name;
+  $("brandName").textContent = BRAND.name;
+
   function person(name, tier, fixed){ return {id:nextId++, name:name, tier:tier, fixed:fixed || ""}; }
+  var TEMPLATES = {
+    wedding:{total:1500, reserve:5, people:[["Venue","must"],["Food and catering","must"],["Photography","nice"],["Outfits","nice"],["Flowers and decor","nice"],["Extras","room"]]},
+    party:{total:300, reserve:5, people:[["Food","must"],["Drinks","nice"],["Cake","nice"],["Decor","nice"],["Music","room"],["Party favors","room"]]},
+    eid:{total:200, reserve:5, people:[["Parents","must"],["Siblings","nice"],["Cousins","nice"],["Eidi for the kids","nice"],["Neighbours","room"]]}
+  };
   function makePlan(key){
     if (key === "bf") return {total:400, cur:"$", reserve:5, example:true, people:[
       person("Dad", "must"), person("Sister", "nice"), person("Cousin", "nice"), person("Treat for me", "room", "25")]};
@@ -283,6 +363,8 @@ var VIA = [
   });
   KEYS.forEach(function(k){ if (!store.plans[k] || !store.plans[k].people) store.plans[k] = makePlan(k); });
   if (KEYS.indexOf(store.active) < 0) store.active = "bf";
+  if (!store.santa || !store.santa.pairs) store.santa = {names:"", limit:"", pairs:[]};
+  var view = TABS.indexOf(store.view) >= 0 ? store.view : store.active;
   var state = store.plans[store.active];
 
   function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e) {} }
@@ -310,8 +392,8 @@ var VIA = [
   }
   function renderClock(){
     var y = new Date().getFullYear(), text = "";
-    if (store.active === "bf") text = phrase("Black Friday", daysTo(blackFriday(y)));
-    else if (store.active === "xmas") {
+    if (view === "bf") text = phrase("Black Friday", daysTo(blackFriday(y)));
+    else if (view === "xmas" || view === "santa") {
       var xm = new Date(y, 11, 25);
       if (daysTo(xm) < 0) xm = new Date(y + 1, 11, 25);
       text = phrase("Christmas", daysTo(xm));
@@ -350,11 +432,15 @@ var VIA = [
     $("tLeft").textContent = money(c.flex);
     $("tLeftBox").classList.toggle("bad", c.flex < 0);
     $("reserveOut").textContent = state.reserve + "%";
+    var frac = c.pot > 0 ? Math.max(0, Math.min(1, c.flex / c.pot)) : 0;
+    $("potFill").setAttribute("y", String(86 - 66 * frac));
+    $("potFill").setAttribute("height", String(66 * frac));
+    $("potCap").textContent = money(c.pot);
 
     var w = $("warn");
     if (c.flex < 0) {
       w.hidden = false;
-      w.textContent = "Known prices are " + money(-c.flex) + " over your gift pot. Raise the total or lower a price.";
+      w.textContent = "Known prices are " + money(-c.flex) + " over your pot. Raise the total or lower a price.";
     } else if (state.people.length && c.wSum === 0 && c.flex > 0) {
       w.hidden = false;
       w.textContent = money(c.flex) + " is not assigned. Remove a known price to let it be shared.";
@@ -430,6 +516,15 @@ var VIA = [
   $("eventName").addEventListener("input", function(e){ state.eventName = e.target.value; renderClock(); save(); });
   $("eventDate").addEventListener("input", function(e){ state.date = e.target.value; renderClock(); save(); });
 
+  $("preset").addEventListener("change", function(e){
+    var t = TEMPLATES[e.target.value];
+    if (!t) return;
+    state.total = t.total; state.reserve = t.reserve; state.example = true;
+    state.people = t.people.map(function(x){ return person(x[0], x[1]); });
+    e.target.value = "";
+    syncInputs(); renderRows();
+  });
+
   $("add").addEventListener("click", function(){
     state.people.push({id:nextId++, name:"", tier:"nice", fixed:""});
     state.example = false;
@@ -449,11 +544,16 @@ var VIA = [
 
   /* ---- occasion tabs ---- */
   function setTab(key){
-    store.active = key;
-    state = store.plans[key];
-    KEYS.forEach(function(k){ $("tab-" + k).setAttribute("aria-selected", k === key ? "true" : "false"); });
+    view = key;
+    store.view = key;
+    if (key !== "santa") { store.active = key; state = store.plans[key]; }
+    TABS.forEach(function(k){ $("tab-" + k).setAttribute("aria-selected", k === key ? "true" : "false"); });
+    var s = key === "santa";
+    $("secBudget").hidden = s; $("secTiles").hidden = s; $("secPeople").hidden = s; $("secShare").hidden = s;
+    $("secSanta").hidden = !s;
+    $("h-people").textContent = key === "custom" ? "Who or what it covers" : "Who you are buying for";
     $("copyMsg").textContent = ""; $("planText").hidden = true;
-    syncInputs(); renderRows(); renderClock();
+    syncInputs(); renderRows(); renderClock(); save();
   }
   document.querySelector(".tabs").addEventListener("click", function(e){
     var b = e.target.closest(".tab"); if (b) setTab(b.getAttribute("data-key"));
@@ -461,7 +561,7 @@ var VIA = [
 
   function planText(){
     var c = compute();
-    var title = store.active === "bf" ? "Black Friday" : store.active === "xmas" ? "Christmas" : (state.eventName || "Gift");
+    var title = store.active === "bf" ? "Black Friday" : store.active === "xmas" ? "Christmas" : (state.eventName || "Budget");
     var lines = [title + " plan: " + money(c.total) + " in total",
                  "Kept back (" + state.reserve + "%): " + money(c.reserve), ""];
     state.people.forEach(function(p){
@@ -487,13 +587,66 @@ var VIA = [
     $("total").value = state.total;
     $("cur").value = state.cur;
     $("reserve").value = state.reserve;
-    $("customFields").hidden = store.active !== "custom";
+    $("customFields").hidden = view !== "custom";
     $("eventName").value = state.eventName || "";
     $("eventDate").value = state.date || "";
   }
 
+  /* ---- Secret Santa ---- */
+  function shuffle(a){
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function renderSanta(){
+    var ul = $("santaList"); ul.innerHTML = "";
+    store.santa.pairs.forEach(function(p){
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "santa-btn"; b.setAttribute("aria-expanded", "false");
+      var n = document.createElement("span"); n.textContent = p.from;
+      var r = document.createElement("span"); r.textContent = "Tap to reveal";
+      b.appendChild(n); b.appendChild(r);
+      b.addEventListener("click", function(){
+        var open = b.getAttribute("aria-expanded") === "true";
+        Array.prototype.forEach.call(ul.querySelectorAll(".santa-btn"), function(x){
+          x.setAttribute("aria-expanded", "false"); x.lastChild.textContent = "Tap to reveal";
+        });
+        if (!open) {
+          b.setAttribute("aria-expanded", "true");
+          r.textContent = "Gives to " + p.to + (store.santa.limit ? ", limit " + store.santa.limit : "");
+        }
+      });
+      li.appendChild(b); ul.appendChild(li);
+    });
+  }
+  $("santaNames").addEventListener("input", function(e){ store.santa.names = e.target.value; save(); });
+  $("santaLimit").addEventListener("input", function(e){ store.santa.limit = e.target.value; save(); });
+  $("santaDraw").addEventListener("click", function(){
+    var names = [], seen = {};
+    $("santaNames").value.split(/\n|,/).forEach(function(s){
+      s = s.trim();
+      if (s && !seen[s.toLowerCase()]) { seen[s.toLowerCase()] = 1; names.push(s); }
+    });
+    var msg = $("santaMsg");
+    if (names.length < 3) { msg.hidden = false; msg.textContent = "Add at least 3 different names, one per line."; return; }
+    msg.hidden = true;
+    var order = shuffle(names.slice()), pairs = [];
+    for (var i = 0; i < order.length; i++) pairs.push({from:order[i], to:order[(i + 1) % order.length]});
+    pairs.sort(function(a, b){ return a.from.localeCompare(b.from); });
+    store.santa.pairs = pairs;
+    save(); renderSanta();
+  });
+  $("santaClear").addEventListener("click", function(){
+    store.santa = {names:"", limit:"", pairs:[]};
+    $("santaNames").value = ""; $("santaLimit").value = "";
+    $("santaMsg").hidden = true;
+    save(); renderSanta();
+  });
+
   /* ---- support section: amount, pay via, send to, payer details ---- */
-  var pay = {amount:5, via:"wise", to:"skrill"};
+  var pay = {amount:3, via:"wise", to:"skrill"};
   var REF = "GBS-" + (function(){
     var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
     for (var i = 0; i < 4; i++) s += a.charAt(Math.floor(Math.random() * a.length));
@@ -523,7 +676,7 @@ var VIA = [
     $("destDetail").textContent = to.detail;
 
     var who = $("payerField").value.trim();
-    $("noteText").textContent = "Gift Budget Splitter support, $" + pay.amount + " via " + (via.phrase || via.label) +
+    $("noteText").textContent = BRAND.name + " support, $" + pay.amount + " via " + (via.phrase || via.label) +
       (who ? ", from " + who : "") + ". Ref " + REF;
   }
   function setAmount(n, fromCustom){
@@ -542,7 +695,7 @@ var VIA = [
   $("customAmt").addEventListener("input", function(e){
     var n = Math.floor(parseFloat(e.target.value));
     if (!isFinite(n)) { $("payMsg").textContent = ""; return; }
-    if (n < 3) { $("payMsg").textContent = "The minimum is $3."; setAmount(3, true); return; }
+    if (n < 1) { $("payMsg").textContent = "The minimum is $1."; setAmount(1, true); return; }
     $("payMsg").textContent = "";
     setAmount(n, true);
   });
@@ -555,10 +708,10 @@ var VIA = [
   });
 
   /* ---- start ---- */
-  KEYS.forEach(function(k){ $("tab-" + k).setAttribute("aria-selected", k === store.active ? "true" : "false"); });
-  syncInputs();
-  renderClock();
-  renderRows();
+  $("santaNames").value = store.santa.names || "";
+  $("santaLimit").value = store.santa.limit || "";
+  renderSanta();
+  setTab(view);
   renderPay();
 })();
 </script>
