@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mB1D0JuwtWx3xNiYnSo/VDb8Tq1yeEXyPoxA1oF/rcU=' 'sha256-9zbkgA2Uhfwp4QOR8URQJUF8N5Vq+5DShpEhQzKylMY=' 'sha256-uMUkCsD/MXZKHJWpCIUc1pYrvGeVsCtD5hQ30dOgQVU='; style-src 'sha256-jS/YkVhB74rlbq8x/aBDrnmSJSCbaBOpum735N3zkcs=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4yBklx5mR+zpOELKOZ1hXReek5nZypupYO88Dqqax28=' 'sha256-9SMZhRPUH1bgZtr4pvx4V/oMcZQ4P57m5/2sA9J9lK0=' 'sha256-uMUkCsD/MXZKHJWpCIUc1pYrvGeVsCtD5hQ30dOgQVU='; style-src 'sha256-qwoy/pADbfMdfpl1uCd16U+hSh87AwtLIH+wWzapdSg=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#066b75">
@@ -50,6 +50,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 html{min-height:100%;background:var(--bg)}
 body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%;
   background:var(--bg) linear-gradient(180deg,var(--g1) 0,var(--g2) 280px,var(--g3) 700px,var(--g4) 100%) no-repeat}
@@ -257,8 +258,9 @@ textarea[hidden]{display:none}
   </section>
 
   <section class="card" id="payCard" aria-labelledby="h-pay">
-    <h2 id="h-pay">Support this tool</h2>
-    <p class="fine">Priced from $1. Choose how you pay and where it goes.</p>
+    <h2 id="h-pay">Unlock Gifty</h2>
+    <p class="fine">The first 3 copies and draws are free. Unlock 30 days from $1. Choose how you pay and where it goes.</p>
+    <p class="fine" id="gateStatus" role="status"></p>
 
     <div class="step">
       <span class="lbl" id="lbl-amt">1. Amount</span>
@@ -294,22 +296,30 @@ textarea[hidden]{display:none}
         <div><small>Payment note, add it to your payment</small><span id="noteText"></span></div>
         <button type="button" id="copyNote">Copy</button>
       </div>
+      <a class="btn primary" id="askWa" target="_blank" rel="noopener" href="https://wa.me/" hidden>Ask for payment details on WhatsApp</a>
     </div>
 
     <p class="fine">For Easypaisa and JazzCash, the equivalent in rupees will be deducted. The amount may vary according to the rate and bank charges.</p>
     <p class="fine">Not every service can send to every account. If yours cannot send to one, choose the other. What you type here stays on your phone and is only used to write the payment note.</p>
     <p class="fine" id="payMsg" role="status"></p>
+    <label for="codeField">5. Enter your unlock code
+      <input id="codeField" type="text" maxlength="20" autocomplete="off" placeholder="GF-XXXX-XXXX">
+    </label>
+    <div class="actions"><button type="button" id="unlockBtn" class="primary">Unlock</button></div>
+    <p class="fine" id="unlockMsg" role="status"></p>
   </section>
 </main>
 
 <script>
 /* ---- BRAND: change the name here to white-label a copy ---- */
 var BRAND = {name:"Gifty"};
+var CONTACT = {whatsapp:"923009560955"};   /* your WhatsApp number, digits with country code */
+var UNLOCK_HASHES = ["16e4e1b59029a3682fc6102e9d8c453e7e84f37f0bb5fd374dc3c6a350d07a96", "8d0db5c6f4747ec97ece6066dc55455af9c06138c8bf2896e136e631ccf47c7c", "3fd2fc891149dca967c7c3609c074f0d8a556295dfe3c794e5571813cc8764b5", "e3611a9b66f09c7e18eb91b2eba868a75cbcda0a270a548660aa9b5bac75b6a0", "ead4c27019c7f686d79725bd0bcdb6efe4f340a2843334ac8809ef50f120a24e", "7611e8047cb7b77b7164fec63e19a1b461cee9c483478b385ff0bb696f901287", "312d0751c9d420e5e781cfd35d108d201cfa7051eee6ba3766984809b7d686ae", "eea8977e4c1957b7e89dbb6c25dd316f27a0e4cb755d9e2a30116e8f53ff1672", "ff4fdc678e958faca3f69ea4c110edc0eaf52c6fafc7003bd95b54bf6b747b46", "9bd860ba6e3a3b7d8f59fb398c9cdbdc0a79b1315451634f93b8093fe49d4c4a", "1739cbc48a1b19142b6b97cc23b904b69b3203735e5e944a73afcc0d6b817e0e", "1f52fbf2bcb315d250235d4c6e4f704bd5d3814311e8755059da80a21f79d121", "06c719e5ea6204e19a249cfcfa9288dd03db079a6dbb1b287ebb1b7f9743e4d3", "416e81cb70c848c009b6dcc7880094d8268e8aa986d9e899d05809d0405505ca", "99d8e1ad3049fb783daf3760a75ea409feb58cbe24a62407eafb1e7e216037e9", "9d000cf5c1f6898c238bf4d5000336a158a30f80faa654ac4c9d443d185b5194", "cdde642861284a69abd0e0408bc4bf6c9f710d2c92d3542cf85ca9da4f683415", "c16ccfed9fccbb87e37c4eb9fac66db1f256189adc40bae7947d529772e62f56", "95d8651ed87c0b295282fa1023814983b8990b69d4cf2b07d1353523d46a348f", "6b5b03acdf87b9616592416290f7cf2fc34232741899c436b55025790e9d8efa", "33f673abe0f8fbc08eeef7f88338c9f903904bc29bd0d5645865310dac663a8f", "1c0f1958b8abb0aae37aed348d5d02bbe332abfdd13611e3d3d9d12daa47a15e", "bef093b358e0532a316d38d3211f89bc6287995ed96275e5eab646f2ac6d413c", "f3a05fe0dd3d2f3ad96e89116930093d21f269c9ad9bb1baa640fa7f788eadde", "eb9c0516894badbe90a038f7c14131d58eb80f38aeedda832771396d66c603dc", "94bf2cbb17da55bd12aa6aba4c43c175880e22e9999757b6a53a8481f89af210", "e7d04e98c5f64f9427713e90bb354f2c84842e1a0ec3d8d794e3b003c7ffe278", "4bf4e5f026a43cf0fe8be645c2f62c227f8153b4a7efd67ce39a46aa7dfaec90", "9e2864f6c9f0d07c5ce5e71c1e067cc93bcb8a9ed31572827706711d352a8117", "d60f31d35ca385890bbac17221d1e720989f93c81d891a43e9d31d36c3d0cd4f"];
 
 /* ---- PAYMENT SETTINGS: where money is received ---- */
 var DEST = [
-  {id:"skrill", label:"Skrill", note:"Skrill email", detail:atob("SGF6ZWwuTnlsZUBnbWFpbC5jb20=")},
-  {id:"easypaisa", label:"Easypaisa", note:"Easypaisa account (IBAN)", detail:atob("UEsxN1RNRkIwMDAwMDAwMDYxMjg0MDQ5")}
+  {id:"skrill", label:"Skrill", note:"Skrill email", detail:""},
+  {id:"easypaisa", label:"Easypaisa", note:"Easypaisa account (IBAN)", detail:""}
 ];
 /* ---- how a payer can send: field = what the payer fills in ---- */
 var VIA = [
@@ -576,6 +586,7 @@ var VIA = [
     catch(e) { done(false); }
   }
   $("copy").addEventListener("click", function(){
+    if (!allow()) return;
     var t = planText(), ta = $("planText");
     ta.value = t;
     var r = copyText(t, "Plan copied.", $("copyMsg"));
@@ -632,6 +643,7 @@ var VIA = [
     var msg = $("santaMsg");
     if (names.length < 3) { msg.hidden = false; msg.textContent = "Add at least 3 different names, one per line."; return; }
     msg.hidden = true;
+    if (!allow()) return;
     var order = shuffle(names.slice()), pairs = [];
     for (var i = 0; i < order.length; i++) pairs.push({from:order[i], to:order[(i + 1) % order.length]});
     pairs.sort(function(a, b){ return a.from.localeCompare(b.from); });
@@ -672,12 +684,17 @@ var VIA = [
     $("payerLabel").textContent = "4. " + via.field;
     $("payerField").placeholder = via.ph;
     $("resTitle").textContent = "Send $" + pay.amount + " via " + (via.phrase || via.label) + " to " + to.label;
-    $("destNote").textContent = to.note;
-    $("destDetail").textContent = to.detail;
+    var onRequest = !!CONTACT.whatsapp;
+    $("destNote").textContent = onRequest ? "Payment details" : to.note;
+    $("destDetail").textContent = onRequest ? "Sent to you on WhatsApp when you ask" : to.detail;
+    $("copyDest").hidden = onRequest;
 
     var who = $("payerField").value.trim();
     $("noteText").textContent = BRAND.name + " support, $" + pay.amount + " via " + (via.phrase || via.label) +
       (who ? ", from " + who : "") + ". Ref " + REF;
+    var ask = $("askWa");
+    if (CONTACT.whatsapp) { ask.hidden = false; ask.href = "https://wa.me/" + CONTACT.whatsapp + "?text=" + encodeURIComponent("Hi, I would like to unlock " + BRAND.name + ". " + $("noteText").textContent); }
+    else ask.hidden = true;
   }
   function setAmount(n, fromCustom){
     pay.amount = n;
@@ -706,6 +723,78 @@ var VIA = [
   $("copyNote").addEventListener("click", function(){
     copyText($("noteText").textContent, "Payment note copied.", $("payMsg"));
   });
+
+  /* ---- sha-256, so codes can be checked without a server ---- */
+  function sha256hex(str){
+    var K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+             0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+             0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+             0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+             0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+             0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+             0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+             0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    var bytes = new TextEncoder().encode(str), l = bytes.length;
+    var nb = ((l + 9 + 63) >> 6) << 6, m = new Uint8Array(nb);
+    m.set(bytes); m[l] = 0x80;
+    var dv = new DataView(m.buffer);
+    dv.setUint32(nb - 4, (l * 8) >>> 0); dv.setUint32(nb - 8, Math.floor(l * 8 / 4294967296));
+    var w = new Uint32Array(64);
+    for (var o = 0; o < nb; o += 64) {
+      var i;
+      for (i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+      for (i = 16; i < 64; i++) {
+        var a = w[i-15], b = w[i-2];
+        var s0 = ((a>>>7)|(a<<25)) ^ ((a>>>18)|(a<<14)) ^ (a>>>3);
+        var s1 = ((b>>>17)|(b<<15)) ^ ((b>>>19)|(b<<13)) ^ (b>>>10);
+        w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
+      }
+      var A=H[0],B=H[1],C=H[2],D=H[3],E=H[4],F=H[5],G=H[6],Hh=H[7];
+      for (i = 0; i < 64; i++) {
+        var S1 = ((E>>>6)|(E<<26)) ^ ((E>>>11)|(E<<21)) ^ ((E>>>25)|(E<<7));
+        var ch = (E & F) ^ (~E & G);
+        var t1 = (Hh + S1 + ch + K[i] + w[i]) >>> 0;
+        var S0 = ((A>>>2)|(A<<30)) ^ ((A>>>13)|(A<<19)) ^ ((A>>>22)|(A<<10));
+        var mj = (A & B) ^ (A & C) ^ (B & C);
+        var t2 = (S0 + mj) >>> 0;
+        Hh = G; G = F; F = E; E = (D + t1) >>> 0; D = C; C = B; B = A; A = (t1 + t2) >>> 0;
+      }
+      H[0]=(H[0]+A)>>>0; H[1]=(H[1]+B)>>>0; H[2]=(H[2]+C)>>>0; H[3]=(H[3]+D)>>>0;
+      H[4]=(H[4]+E)>>>0; H[5]=(H[5]+F)>>>0; H[6]=(H[6]+G)>>>0; H[7]=(H[7]+Hh)>>>0;
+    }
+    return H.map(function(h){ return ("00000000" + h.toString(16)).slice(-8); }).join("");
+  }
+  /*END sha*/
+
+  /* ---- unlock gate: 3 free copies or draws, then a code ---- */
+  var FREE = 3, DAYS = 31;
+  if (!store.gate) store.gate = {used:0, unlockUntil:0};
+  function renderGate(){
+    var gt = store.gate, s = $("gateStatus");
+    if (gt.unlockUntil > Date.now()) s.textContent = "Unlocked until " + new Date(gt.unlockUntil).toLocaleDateString("en-GB", {day:"numeric", month:"short"});
+    else s.textContent = gt.used < FREE ? (FREE - gt.used) + " free copies or draws left" : "No free copies or draws left";
+  }
+  function allow(){
+    var gt = store.gate;
+    if (gt.unlockUntil > Date.now()) return true;
+    if (gt.used < FREE) { gt.used++; save(); renderGate(); return true; }
+    $("unlockMsg").textContent = "You have used your 3 free copies and draws. Unlock from $1 to keep going.";
+    try { $("payCard").scrollIntoView({behavior:"smooth", block:"start"}); } catch(e) {}
+    return false;
+  }
+  $("unlockBtn").addEventListener("click", function(){
+    var code = $("codeField").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (code.length < 6) { $("unlockMsg").textContent = "Enter the code you were sent."; return; }
+    if (UNLOCK_HASHES.indexOf(sha256hex(code)) >= 0) {
+      store.gate.unlockUntil = Date.now() + DAYS * 86400000; save(); renderGate();
+      $("unlockMsg").textContent = "Unlocked for 30 days. Thank you!";
+      $("codeField").value = "";
+    } else {
+      $("unlockMsg").textContent = "That code did not match. Check it and try again.";
+    }
+  });
+  renderGate();
 
   /* ---- start ---- */
   $("santaNames").value = store.santa.names || "";
